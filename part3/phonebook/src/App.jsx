@@ -76,11 +76,16 @@ const App = () => {
         .then(response => {
           setClassName(`success`);
           setMessage(`Added ${newName}`)
-
+          setPersons(persons.concat(newPerson));
+          setTimeout(() => setMessage(null), 4000);
+        })
+        .catch(error => {
+          setClassName('error');
+          setMessage(`Error adding ${newName}`);
+          console.log(error);
           setTimeout(() => setMessage(null), 4000);
         })
 
-      setPersons(persons.concat(newPerson));
       setNewName('');
       setNewNumber('');
     }
