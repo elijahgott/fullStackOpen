@@ -1,0 +1,9 @@
+POST http://localhost:3003/api/blogs
+content-type: application/json
+
+{
+    "title": "Gender Bender Jenner's Fender Bender",
+    "author": "Nicole Mullen",
+    "url": "https://night.channel/gender-bender-jenners-fender-bender/",
+    "likes": 1000
+}
