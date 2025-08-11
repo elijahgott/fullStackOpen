@@ -2,8 +2,9 @@ POST http://localhost:3003/api/blogs
 content-type: application/json
 
 {
-    "title": "A Mommy Blogger’s Open Letter To Iran",
+    "title": "Can We Stop Pretending Like Abortions Dont Feel Good?",
     "author": "Nicole Mullen",
-    "url": "https://night.channel/a-mommy-bloggers-open-letter-to-iran/",
-    "likes": 3000
+    "url": "https://night.channel/can-we-stop-pretending-like-abortions-dont-feel-good/",
+    "likes": 1000000,
+    "userId": "689a77a3958ec74c06df7bf0"
 }
