@@ -1,6 +1,6 @@
 const blogsRouter = require('express').Router()
 const Blog = require('../models/blog')
-const User = require('../models/user')
+const userExtractor = require('../utils/middleware').userExtractor
 
 blogsRouter.get('/', async (request, response) => {
   const blogs = await Blog
@@ -8,15 +8,9 @@ blogsRouter.get('/', async (request, response) => {
   response.json(blogs)
 })
 
-blogsRouter.post('/', async (request, response, next) => {
+blogsRouter.post('/', userExtractor, async (request, response, next) => {
   const body = request.body
-  
-  const user = await User.findById(body.userId)
-
-  if(!user){
-    return response.status(400).json({ error: 'userId missing or not valid' })
-  }
-
+  const user = request.user
   const blog = new Blog({
     title: body.title,
     author: body.author,
@@ -33,19 +27,22 @@ blogsRouter.post('/', async (request, response, next) => {
 })
 
 // 4.13
-blogsRouter.delete('/:id', async (request, response) => {
-  try{
-    await Blog.findByIdAndDelete(request.params.id)
-    response.status(204).end()
+blogsRouter.delete('/:id', userExtractor, async (request, response) => {
+  const { id } = request.params
+  const user = request.user
+  const blogToDelete = await Blog.findById(id)
+
+  if(blogToDelete.user.toString() !== user.id.toString()){
+    return response.status(401).json({ error: 'Unauthorized to delete'})
   }
-  catch(exception){
-    response.status(404).end()
-  }
+  await Blog.findByIdAndDelete(id)
+  response.status(204).end()
 })
 
 // 4.14
-blogsRouter.put('/:id', async (request, response) => {
+blogsRouter.put('/:id', userExtractor, async (request, response) => {
   const { title, author, url, likes } = request.body
+  const user = request.user
 
   const blog = {
     title,

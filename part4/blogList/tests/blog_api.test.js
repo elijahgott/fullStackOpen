@@ -64,8 +64,17 @@ describe('adding new blog', () => {
             likes: 10
         }
 
+        const user = {
+            username: 'root',
+            password: 'sekret'
+        }
+
+        const loginResponse = await api.post('/api/login').send(user)
+        const { token } = loginResponse.body 
+
         await api
             .post('/api/blogs')
+            .set('Authorization', `Bearer ${token}`)
             .send(newBlog)
             .expect(201)
             .expect('Content-Type', /application\/json/)
@@ -95,11 +104,24 @@ describe('deleting blog', () => {
 
     // 4.13
     test('delete blog from id', async () => {
+        // does not work at the moment, internal server error? ???
         const response = await api.get('/api/blogs')
         const blogToDelete = response.body[0]
 
+        const user = {
+            username: 'root',
+            password: 'sekret'
+        }
+        const users = await User.find({ username: user.username })
+
+        blogToDelete.user = users[0]._id.toString()
+
+        const loginResponse = await api.post('/api/login').send(user)
+        const { token } = loginResponse.body 
+
         await api
-            .delete(`/api/blogs/${blogToDelete.id}`)
+            .delete(`/api/blogs/${blogToDelete.id}`) // i believe the issue is in here. maybe 
+            .set('Authorization', `Bearer ${token}`)
             .expect(204)
         
         const responseAfterDeletion = await api.get('/api/blogs')
@@ -124,8 +146,17 @@ describe('updating blog', () => {
         const blogToUpdate = response.body[0]
         blogToUpdate.likes = 333
 
+        const user = {
+            username: 'root',
+            password: 'sekret'
+        }
+
+        const loginResponse = await api.post('/api/login').send(user)
+        const { token } = loginResponse.body 
+
         await api
             .put(`/api/blogs/${blogToUpdate.id}`)
+            .set('Authorization', `Bearer ${token}`)
             .send(blogToUpdate)
             .expect(200)
         
