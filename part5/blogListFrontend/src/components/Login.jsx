@@ -1,7 +1,14 @@
-import {useState} from 'react'
+import { useState } from 'react'
 import loginService from '../services/login'
+import PropTypes from 'prop-types'
 
 const Login = ({ setNotificationClass, setMessage }) => {
+    const loginStyle = {
+        textAlign: 'center',
+        width: 'fit-content',
+        margin: '0 auto',
+    }
+
     const [username, setUsername] = useState('')
     const [password, setPassword] = useState('')
     const [user, setUser] = useState(null)
@@ -36,7 +43,7 @@ const Login = ({ setNotificationClass, setMessage }) => {
     }
 
     return (
-        <div>
+        <div style={loginStyle}>
             <h1>Login</h1>
             <form onSubmit={handleLogin}>
                 <input type="text" value={username} name="Username" onChange={({ target }) => setUsername(target.value)} placeholder="Enter Username:" />
@@ -45,6 +52,11 @@ const Login = ({ setNotificationClass, setMessage }) => {
             </form>
         </div>
     )
+}
+
+Login.PropTypes = {
+    setNotificationClass: PropTypes.string.isRequired,
+    setMessage: PropTypes.string.isRequired
 }
 
 export default Login

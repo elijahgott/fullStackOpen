@@ -2,13 +2,17 @@ import { useState } from 'react'
 import blogService from '../services/blogs'
 
 const CreateBlog = ({ user, setNotificationClass, setMessage }) => {
+    const formStyle={
+        margin: '8px'
+    }
+
     const [title, setTitle] = useState('')
     const [author, setAuthor] = useState('')
     const [url, setUrl] = useState('')
 
     const handleSubmit = (event) => {
         event.preventDefault()
-        
+
         if(title && author && url){
             const newBlog = {
                 title,
@@ -23,7 +27,7 @@ const CreateBlog = ({ user, setNotificationClass, setMessage }) => {
             setMessage(`New Blog "${title}" by ${author} added!`)
             setTimeout(() => {
                 setNotificationClass(null)
-            setMessage(null)
+                setMessage(null)
             }, 3000)
 
             setTitle('')
@@ -32,16 +36,16 @@ const CreateBlog = ({ user, setNotificationClass, setMessage }) => {
         }
         else{
             setNotificationClass('error')
-            setMessage(`Failed to add blog.`)
+            setMessage('Failed to add blog.')
             setTimeout(() => {
                 setNotificationClass(null)
-            setMessage(null)
+                setMessage(null)
             }, 3000)
         }
     }
 
     return(
-        <form onSubmit={handleSubmit}>
+        <form style={formStyle} onSubmit={handleSubmit}>
             <input type="text" value={title} onChange={({ target }) => setTitle(target.value)} placeholder="Title" />
             <input type="text" value={author} onChange={({ target }) => setAuthor(target.value)} placeholder="Author" />
             <input type="text" value={url} onChange={({ target }) => setUrl(target.value)} placeholder="URL" />
