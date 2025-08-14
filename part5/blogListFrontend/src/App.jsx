@@ -17,6 +17,21 @@ const App = () => {
     // for sorting blogs by likes
     const byLikes = (b1, b2) => b2.likes - b1.likes
 
+    // for blog component
+    const likeBlog = async (blog) => {
+        const updatedBlog = blog
+        updatedBlog.likes += 1
+
+        await blogService.update(blog.id, updatedBlog)
+    }
+
+    // for blog component
+    const removeBlog = async (blog) => {
+        if(window.confirm(`Remove blog ${blog.title} by ${blog.author}?`)){
+            await blogService.remove(blog.id)
+        }
+    }
+
     useEffect(() => {
         blogService.getAll().then(blogs =>
             setBlogs( blogs )
@@ -51,7 +66,7 @@ const App = () => {
                         <CreateBlog user={user} setNotificationClass={setNotificationClass} setMessage={setMessage} />
                     </Togglable>
                     {blogs.sort(byLikes).map(blog =>
-                        <Blog key={blog.id} blog={blog} />
+                        <Blog key={blog.id} blog={blog} likeBlog={likeBlog} removeBlog={removeBlog} />
                     )
                     }
                 </>

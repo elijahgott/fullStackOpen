@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import blogService from '../services/blogs'
 
-const Blog = ({ blog }) => {
+const Blog = ({ blog, likeBlog, removeBlog }) => {
     const blogStyle = {
         border: '2px solid black',
         borderRadius: '8px',
@@ -15,23 +15,23 @@ const Blog = ({ blog }) => {
         setShowDetails(!showDetails)
     }
 
-    const likeBlog = async (blog) => {
-        const updatedBlog = blog
-        updatedBlog.likes += 1
+    // const likeBlog = async (blog) => {
+    //     const updatedBlog = blog
+    //     updatedBlog.likes += 1
 
-        await blogService.update(blog.id, updatedBlog)
-    }
+    //     await blogService.update(blog.id, updatedBlog)
+    // }
 
-    const removeBlog = async (blog) => {
-        if(window.confirm(`Remove blog ${blog.title} by ${blog.author}?`)){
-            await blogService.remove(blog.id)
-        }
-    }
+    // const removeBlog = async (blog) => {
+    //     if(window.confirm(`Remove blog ${blog.title} by ${blog.author}?`)){
+    //         await blogService.remove(blog.id)
+    //     }
+    // }
 
     if(!showDetails){
         return (
             <div style={blogStyle}>
-                {blog.title}<button onClick={toggleDetails}>view</button>
+                {blog.title} - By: {blog.author}<button onClick={toggleDetails}>view</button>
             </div>
         )
     }
