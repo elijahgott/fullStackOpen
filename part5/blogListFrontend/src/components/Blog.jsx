@@ -11,6 +11,8 @@ const Blog = ({ blog, likeBlog, removeBlog }) => {
 
     const [showDetails, setShowDetails] = useState(false)
 
+    const [likes, setLikes] = useState(blog.likes)
+
     const toggleDetails = () => {
         setShowDetails(!showDetails)
     }
@@ -30,16 +32,19 @@ const Blog = ({ blog, likeBlog, removeBlog }) => {
 
     if(!showDetails){
         return (
-            <div style={blogStyle}>
+            <div data-testid='blogClosed' style={blogStyle}>
                 {blog.title} - By: {blog.author}<button onClick={toggleDetails}>view</button>
             </div>
         )
     }
     return (
-        <div style={blogStyle}>
+        <div data-testid='blogOpened' style={blogStyle}>
             <p>{blog.title} - By: {blog.author}<button onClick={toggleDetails}>hide</button></p>
             <p>{blog.url}</p>
-            <p>{blog.likes} likes <button onClick={() => likeBlog(blog)}>like</button></p>
+            <p>{likes} likes <button data-testid='likeButton' onClick={() => {
+                setLikes(likes + 1)
+                likeBlog(blog)}
+            }>like</button></p>
             <p>{blog.user.username}</p>
             <button onClick={() => removeBlog(blog)}>remove</button>
         </div>
