@@ -46,10 +46,10 @@ const CreateBlog = ({ user, setNotificationClass, setMessage }) => {
 
     return(
         <form style={formStyle} onSubmit={handleSubmit}>
-            <input type="text" value={title} onChange={({ target }) => setTitle(target.value)} placeholder="Title" />
-            <input type="text" value={author} onChange={({ target }) => setAuthor(target.value)} placeholder="Author" />
-            <input type="text" value={url} onChange={({ target }) => setUrl(target.value)} placeholder="URL" />
-            <button type="submit">Submit Blog</button>
+            <input type="text" data-testid='title' value={title} onChange={({ target }) => setTitle(target.value)} placeholder="Title" />
+            <input type="text" data-testid='author' value={author} onChange={({ target }) => setAuthor(target.value)} placeholder="Author" />
+            <input type="text" data-testid='url' value={url} onChange={({ target }) => setUrl(target.value)} placeholder="URL" />
+            <button type="submit" data-testid='submitBlog'>Submit Blog</button>
         </form>
     )
 }
