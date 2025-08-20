@@ -1,3 +1,5 @@
+import { createSlice, current } from '@reduxjs/toolkit'
+
 const anecdotesAtStart = [
   'If it hurts, do it more often',
   'Adding manpower to a late software project makes it later!',
@@ -17,42 +19,69 @@ const asObject = (anecdote) => {
   }
 }
 
-export const voteFor = (id) => {
-  return{
-    type: 'VOTE',
-    payload: { id }
-  }
-}
+// export const voteFor = (id) => {
+//   return{
+//     type: 'VOTE',
+//     payload: { id }
+//   }
+// }
 
-export const createNew = (content) => {
-  return{
-    type: 'CREATE',
-    payload: {
-      content,
-      id: getId(),
-      votes: 0
-    }
-  }
-}
+// export const createNew = (content) => {
+//   return{
+//     type: 'CREATE',
+//     payload: {
+//       content,
+//       id: getId(),
+//       votes: 0
+//     }
+//   }
+// }
 
 const initialState = anecdotesAtStart.map(asObject)
 
-const reducer = (state = initialState, action) => {
-  console.log('state now: ', state)
-  console.log('action', action)
+// const reducer = (state = initialState, action) => {
+//   console.log('state now: ', state)
+//   console.log('action', action)
 
-  switch (action.type) {
-    case 'VOTE':
-      const id = action.payload.id
-      const votedFor = state.find(a => a.id === id)
-      votedFor.votes = votedFor.votes + 1
-      return state.map(a => a.id !== id ? a : votedFor)
+//   switch (action.type) {
+//     case 'VOTE':
       
-    case 'CREATE':
-      return state.concat(action.payload)
+      
+//     case 'CREATE':
+//       return state.concat(action.payload)
 
-    default: return state
+//     default: return state
+//   }
+// }
+
+// export default reducer
+
+const anecdoteSlice = createSlice({
+  name: 'anecdotes',
+  initialState,
+  reducers: {
+    createNew(state, action) {
+      const content = action.payload
+      const newAnecdote = {
+        content,
+        id: getId(),
+        votes: 0
+      }
+      state.push(newAnecdote)
+    },
+    voteFor(state, action) {
+      const id = action.payload
+      const votedFor = state.find(a => a.id === id) // i believe issue comes from here
+      const updatedAnecdote = {
+        ...votedFor,
+        votes: votedFor.votes + 1
+      }
+
+      return state.map(a => a.id !== id ? a : updatedAnecdote)
+    }
   }
-}
+})
 
-export default reducer
+
+export const { createNew, voteFor } = anecdoteSlice.actions
+export default anecdoteSlice.reducer
