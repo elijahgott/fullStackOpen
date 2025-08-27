@@ -3,7 +3,7 @@ import styled from 'styled-components'
 const Login = ({ handleLogin, username, setUsername, password, setPassword }) => {
     const Container = styled.div`
         width: 90%;
-        margin: 0 auto;
+        margin: 20% auto;
     `
 
     const Form = styled.form`

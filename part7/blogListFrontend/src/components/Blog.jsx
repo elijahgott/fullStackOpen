@@ -35,7 +35,19 @@ const Blog = ({ blog, likeBlog, removeBlog }) => {
 
     const ExpandedBlogContainer = styled.div`
         border-bottom: 2px solid peru;
-        display: block;
+        display: flex;
+        flex-direction: column;
+    `
+
+    const BlogInfo = styled.div`
+        display: flex;
+        flex-direction: column;
+    `
+
+    const BlogTitle = styled.div`
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
     `
 
     const Button = styled.button`
@@ -59,15 +71,18 @@ const Blog = ({ blog, likeBlog, removeBlog }) => {
 
     return (
         <ExpandedBlogContainer data-testid='blogOpened'>
-            <div>
-                <p>{blog.title} - By: {blog.author}<Button onClick={toggleDetails}>hide</Button></p>
+            <BlogInfo>
+                <BlogTitle>
+                    <p>{blog.title} - By: {blog.author}</p>
+                    <Button onClick={toggleDetails}>hide</Button>
+                </BlogTitle>
                 <p>{blog.url}</p>
                 <p>{likes} likes <Button data-testid='likeButton' onClick={() => {
                     setLikes(likes + 1)
                     likeBlog(blog)}
                 }>like</Button></p>
                 <p>{blog.user.username}</p>
-            </div>
+            </BlogInfo>
             <Button onClick={() => removeBlog(blog)}>remove</Button>
         </ExpandedBlogContainer>
     )

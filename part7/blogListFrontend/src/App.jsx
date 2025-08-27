@@ -87,7 +87,7 @@ const App = () => {
     const Container = styled.div`
         background-color: antiquewhite;
         width: 90%;
-        margin: 0 auto;
+        margin: 5% auto;
         padding: 12px;
         border: 4px solid peru;
         border-radius: 8px;
