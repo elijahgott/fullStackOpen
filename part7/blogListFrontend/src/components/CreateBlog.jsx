@@ -1,16 +1,12 @@
-import { useState } from 'react'
+import { useState, useContext } from 'react'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import blogService from '../services/blogs'
 import styled from 'styled-components'
 
+import UserContext from '../UserContext'
 import { useNotificationsDispatch } from '../NotificationContext'
 
-
 // STYLES
-const Container = styled.div`
-  width: 90%;
-  margin: 0 auto;
-`
-
 const Form = styled.form`
   display: flex;
   flex-direction: row;
@@ -35,7 +31,16 @@ const Input = styled.input`
   border-bottom: 2px solid black;
 `
 
-const CreateBlog = ({ user, setNotificationClass, blogs, setBlogs }) => {
+const CreateBlog = ({ setNotificationClass }) => {
+  const [user] = useContext(UserContext)
+  const queryClient = useQueryClient()
+
+  const newBlogMutation = useMutation({
+    mutationFn: blogService.create,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['blogs'] })
+    },
+  })
   const dispatchNotification = useNotificationsDispatch()
 
   const formStyle = {
@@ -49,7 +54,7 @@ const CreateBlog = ({ user, setNotificationClass, blogs, setBlogs }) => {
   const handleSubmit = (event) => {
     event.preventDefault()
 
-    if ((title && author && url) && title.length >= 5) {
+    if (title && author && url && title.length >= 5) {
       const newBlog = {
         title,
         author,
@@ -57,18 +62,17 @@ const CreateBlog = ({ user, setNotificationClass, blogs, setBlogs }) => {
         user,
       }
 
-      blogService.create(newBlog)
-      setBlogs(blogs.concat(newBlog))
+      newBlogMutation.mutate(newBlog)
 
       setNotificationClass('success')
       dispatchNotification({
         type: 'SET',
-        message: `New Blog "${title}" by ${author} added!`
+        message: `New Blog "${title}" by ${author} added!`,
       })
       setTimeout(() => {
         setNotificationClass(null)
         dispatchNotification({
-          type: 'CLEAR'
+          type: 'CLEAR',
         })
       }, 3000)
 
@@ -79,12 +83,12 @@ const CreateBlog = ({ user, setNotificationClass, blogs, setBlogs }) => {
       setNotificationClass('error')
       dispatchNotification({
         type: 'SET',
-        message: 'Failed to add blog.'
+        message: 'Failed to add blog.',
       })
       setTimeout(() => {
         setNotificationClass(null)
         dispatchNotification({
-          type: 'CLEAR'
+          type: 'CLEAR',
         })
       }, 3000)
     }

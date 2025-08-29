@@ -1,4 +1,7 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useReducer, createContext } from 'react'
+import { useQuery, useQueryClient, useMutation } from '@tanstack/react-query'
+import UserContext from './UserContext'
+import { userReducer } from './UserContext'
 import styled from 'styled-components'
 import Togglable from './components/Togglable'
 import Login from './components/Login'
@@ -37,8 +40,10 @@ const Header = styled.div`
 `
 
 const App = () => {
-  const [blogs, setBlogs] = useState([])
-  const [user, setUser] = useState(null)
+  const queryClient = useQueryClient()
+
+  // for logged in user
+  const [user, userDispatch] = useReducer(userReducer, null)
 
   // for notification
   const dispatchNotification = useNotificationsDispatch()
@@ -48,17 +53,30 @@ const App = () => {
   const byLikes = (b1, b2) => b2.likes - b1.likes
 
   // for blog component
+  const likeBlogMutation = useMutation({
+    mutationFn: blogService.update,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['blogs'] })
+    },
+  })
+
   const likeBlog = async (blog) => {
     const updatedBlog = blog
     updatedBlog.likes += 1
 
-    await blogService.update(blog.id, updatedBlog)
+    likeBlogMutation.mutate(updatedBlog)
   }
 
-  // for blog component
+  const deleteBlogMutation = useMutation({
+    mutationFn: blogService.remove,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['blogs'] })
+    },
+  })
+
   const removeBlog = async (blog) => {
     if (window.confirm(`Remove blog ${blog.title} by ${blog.author}?`)) {
-      await blogService.remove(blog.id)
+      deleteBlogMutation.mutate(blog.id)
     }
   }
 
@@ -68,115 +86,127 @@ const App = () => {
 
   const handleLogin = async (event) => {
     event.preventDefault()
-    console.log('logging in with', username, password)
 
     try {
       const user = await loginService.login({ username, password })
       window.localStorage.setItem('loggedInUser', JSON.stringify(user))
 
-      setUser(user)
+      userDispatch({
+        type: 'SET',
+        payload: user,
+      })
+
       setUsername('')
       setPassword('')
 
       dispatchNotification({
         type: 'SET',
-        message: `Signed in as ${username}`
+        message: `Signed in as ${username}`,
       })
       setNotificationClass('success')
       setTimeout(() => {
         dispatchNotification({
-          type: 'CLEAR'
+          type: 'CLEAR',
         })
         setNotificationClass(null)
       }, 3000)
     } catch (exception) {
       dispatchNotification({
         type: 'SET',
-        message: 'Wrong username or password.'
+        message: 'Wrong username or password.',
       })
       setNotificationClass('error')
       setTimeout(() => {
         dispatchNotification({
-          type: 'CLEAR'
+          type: 'CLEAR',
         })
         setNotificationClass(null)
       }, 3000)
     }
   }
 
-  useEffect(() => {
-    blogService.getAll().then((blogs) => setBlogs(blogs))
-  }, [])
+  const result = useQuery({
+    queryKey: ['blogs'],
+    queryFn: () => blogService.getAll(),
+  })
 
   useEffect(() => {
     const userJSON = window.localStorage.getItem('loggedInUser')
 
     if (userJSON) {
       const user = JSON.parse(userJSON)
-      setUser(user)
+      userDispatch({
+        type: 'SET',
+        payload: user,
+      })
       blogService.setToken(user.token)
     }
   }, [])
 
-  return (
-    <Container>
-      <Notification className={notificationClass} />
-      {user === null ? (
-        <Login
-          handleLogin={handleLogin}
-          username={username}
-          setUsername={setUsername}
-          password={password}
-          setPassword={setPassword}
-        />
-      ) : (
-        <>
-          <Header>
-            <h2 style={{ fontSize: '32px' }}>Blogs</h2>
-            <div>
-              Signed in as {user.username}
-              <Button
-                style={{ marginLeft: 4 }}
-                onClick={() => {
-                  window.localStorage.removeItem('loggedInUser')
-                  setUser(null)
-                  setNotificationClass('success')
-                  dispatchNotification({
-                    type: 'SET',
-                    message: 'Signed out.'
-                  })
-                  setTimeout(() => {
-                    dispatchNotification({
-                      type: 'CLEAR'
-                    })
-                    setNotificationClass(null)
-                  }, 3000)
-                }}
-              >
-                Log Out
-              </Button>
-            </div>
-          </Header>
+  if (result.isLoading) {
+    return <div>Loading data...</div>
+  }
 
-          <Togglable buttonLabel={'New Note'}>
-            <CreateBlog
-              user={user}
-              setNotificationClass={setNotificationClass}
-              blogs={blogs}
-              setBlogs={setBlogs}
-            />
-          </Togglable>
-          {blogs.sort(byLikes).map((blog) => (
-            <Blog
-              key={blog.id}
-              blog={blog}
-              likeBlog={likeBlog}
-              removeBlog={removeBlog}
-            />
-          ))}
-        </>
-      )}
-    </Container>
+  const blogs = result.data
+
+  return (
+    <UserContext.Provider value={[user, userDispatch]}>
+      <Container>
+        <Notification className={notificationClass} />
+        {user === null ? (
+          <Login
+            handleLogin={handleLogin}
+            username={username}
+            setUsername={setUsername}
+            password={password}
+            setPassword={setPassword}
+          />
+        ) : (
+          <>
+            <Header>
+              <h2 style={{ fontSize: '32px' }}>Blogs</h2>
+              <div>
+                Signed in as {user.username}
+                <Button
+                  style={{ marginLeft: 4 }}
+                  onClick={() => {
+                    window.localStorage.removeItem('loggedInUser')
+                    userDispatch({ type: 'CLEAR' })
+                    setNotificationClass('success')
+                    dispatchNotification({
+                      type: 'SET',
+                      message: 'Signed out.',
+                    })
+                    setTimeout(() => {
+                      dispatchNotification({
+                        type: 'CLEAR',
+                      })
+                      setNotificationClass(null)
+                    }, 3000)
+                  }}
+                >
+                  Log Out
+                </Button>
+              </div>
+            </Header>
+
+            <Togglable buttonLabel={'New Note'}>
+              <CreateBlog
+                setNotificationClass={setNotificationClass}
+              />
+            </Togglable>
+            {blogs.sort(byLikes).map((blog) => (
+              <Blog
+                key={blog.id}
+                blog={blog}
+                likeBlog={likeBlog}
+                removeBlog={removeBlog}
+              />
+            ))}
+          </>
+        )}
+      </Container>
+    </UserContext.Provider>
   )
 }
 

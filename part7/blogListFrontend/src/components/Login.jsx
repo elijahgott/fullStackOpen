@@ -37,7 +37,6 @@ const Login = ({
   password,
   setPassword,
 }) => {
-
   return (
     <Container>
       <h1 style={{ textAlign: 'center', fontSize: 40 }}>Login</h1>
