@@ -1,15 +1,21 @@
 import { useState, useEffect, useReducer, createContext } from 'react'
+import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom'
 import { useQuery, useQueryClient, useMutation } from '@tanstack/react-query'
 import UserContext from './UserContext'
 import { userReducer } from './UserContext'
 import styled from 'styled-components'
+
 import Togglable from './components/Togglable'
 import Login from './components/Login'
 import Blog from './components/Blog'
 import Notification from './components/Notification'
+import CreateBlog from './components/CreateBlog'
+import Users from './components/Users'
+import User from './components/User'
+
 import blogService from './services/blogs'
 import loginService from './services/login'
-import CreateBlog from './components/CreateBlog'
+import userService from './services/users'
 
 import { useNotificationsDispatch } from './NotificationContext'
 
@@ -125,6 +131,7 @@ const App = () => {
     }
   }
 
+  // gets all blogs
   const result = useQuery({
     queryKey: ['blogs'],
     queryFn: () => blogService.getAll(),
@@ -143,70 +150,108 @@ const App = () => {
     }
   }, [])
 
+  // gets all users
+  const userResult = useQuery({
+    queryKey: ['users'],
+    queryFn: () => userService.getAll(),
+  })
+
   if (result.isLoading) {
     return <div>Loading data...</div>
   }
 
   const blogs = result.data
+  const users = userResult.data
 
   return (
-    <UserContext.Provider value={[user, userDispatch]}>
-      <Container>
-        <Notification className={notificationClass} />
-        {user === null ? (
-          <Login
-            handleLogin={handleLogin}
-            username={username}
-            setUsername={setUsername}
-            password={password}
-            setPassword={setPassword}
-          />
-        ) : (
-          <>
-            <Header>
-              <h2 style={{ fontSize: '32px' }}>Blogs</h2>
-              <div>
-                Signed in as {user.username}
-                <Button
-                  style={{ marginLeft: 4 }}
-                  onClick={() => {
-                    window.localStorage.removeItem('loggedInUser')
-                    userDispatch({ type: 'CLEAR' })
-                    setNotificationClass('success')
-                    dispatchNotification({
-                      type: 'SET',
-                      message: 'Signed out.',
-                    })
-                    setTimeout(() => {
+    <Router>
+      <UserContext.Provider value={[user, userDispatch]}>
+        <Container>
+          <Notification className={notificationClass} />
+          {user === null ? (
+            <Login
+              handleLogin={handleLogin}
+              username={username}
+              setUsername={setUsername}
+              password={password}
+              setPassword={setPassword}
+            />
+          ) : (
+            <>
+              <Header>
+                <h2 style={{ fontSize: '32px' }}>Blogs</h2>
+                <div>
+                  Signed in as {user.username}
+                  <Button
+                    style={{ marginLeft: 4 }}
+                    onClick={() => {
+                      window.localStorage.removeItem('loggedInUser')
+                      userDispatch({ type: 'CLEAR' })
+                      setNotificationClass('success')
                       dispatchNotification({
-                        type: 'CLEAR',
+                        type: 'SET',
+                        message: 'Signed out.',
                       })
-                      setNotificationClass(null)
-                    }, 3000)
-                  }}
-                >
-                  Log Out
-                </Button>
-              </div>
-            </Header>
+                      setTimeout(() => {
+                        dispatchNotification({
+                          type: 'CLEAR',
+                        })
+                        setNotificationClass(null)
+                      }, 3000)
+                    }}
+                  >
+                    Log Out
+                  </Button>
+                </div>
+              </Header>
+            </>
+          )}
 
-            <Togglable buttonLabel={'New Note'}>
-              <CreateBlog
-                setNotificationClass={setNotificationClass}
-              />
-            </Togglable>
-            {blogs.sort(byLikes).map((blog) => (
-              <Blog
-                key={blog.id}
-                blog={blog}
-                likeBlog={likeBlog}
-                removeBlog={removeBlog}
-              />
-            ))}
-          </>
-        )}
-      </Container>
-    </UserContext.Provider>
+          <Routes>
+            <Route
+              path="/"
+              element={
+                <>
+                  <Togglable buttonLabel={'New Note'}>
+                    <CreateBlog setNotificationClass={setNotificationClass} />
+                  </Togglable>
+                  {blogs.sort(byLikes).map((blog) => (
+                    <Blog
+                      key={blog.id}
+                      blog={blog}
+                      likeBlog={likeBlog}
+                      removeBlog={removeBlog}
+                    />
+                  ))}
+                </>
+              }
+            />
+            <Route
+              path="/users"
+              element={
+                <>
+                  <h1>Users</h1>
+                  <table>
+                    <thead>
+                      <tr>
+                        <th></th>
+                        <th>blogs created</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {!users
+                        ? null
+                        : users.map((u) => <Users key={u.id} user={u} />)}
+                    </tbody>
+                  </table>
+                </>
+              }
+            />
+            <Route path="/users/:id" element={<User users={users} />} />
+          </Routes>
+        </Container>
+      </UserContext.Provider>
+    </Router>
   )
 }
 

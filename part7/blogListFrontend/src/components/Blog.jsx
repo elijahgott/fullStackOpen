@@ -46,19 +46,6 @@ const Blog = ({ blog, likeBlog, removeBlog }) => {
     setShowDetails(!showDetails)
   }
 
-  // const likeBlog = async (blog) => {
-  //     const updatedBlog = blog
-  //     updatedBlog.likes += 1
-
-  //     await blogService.update(blog.id, updatedBlog)
-  // }
-
-  // const removeBlog = async (blog) => {
-  //     if(window.confirm(`Remove blog ${blog.title} by ${blog.author}?`)){
-  //         await blogService.remove(blog.id)
-  //     }
-  // }
-
   if (!showDetails) {
     return (
       <BlogContainer data-testid="blogClosed">

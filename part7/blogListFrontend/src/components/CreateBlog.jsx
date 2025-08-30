@@ -9,8 +9,8 @@ import { useNotificationsDispatch } from '../NotificationContext'
 // STYLES
 const Form = styled.form`
   display: flex;
-  flex-direction: row;
-  width: fit-content;
+  flex-direction: column;
+  width: auto;
   margin: 0 auto;
 `
 
@@ -99,6 +99,7 @@ const CreateBlog = ({ setNotificationClass }) => {
       <Input
         type="text"
         data-testid="title"
+        name='title'
         value={title}
         onChange={({ target }) => setTitle(target.value)}
         placeholder="Title"
@@ -106,6 +107,7 @@ const CreateBlog = ({ setNotificationClass }) => {
       <Input
         type="text"
         data-testid="author"
+        name='author'
         value={author}
         onChange={({ target }) => setAuthor(target.value)}
         placeholder="Author"
@@ -113,6 +115,7 @@ const CreateBlog = ({ setNotificationClass }) => {
       <Input
         type="text"
         data-testid="url"
+        name='url'
         value={url}
         onChange={({ target }) => setUrl(target.value)}
         placeholder="URL"
