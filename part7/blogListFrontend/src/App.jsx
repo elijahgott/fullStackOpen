@@ -3,8 +3,10 @@ import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom'
 import { useQuery, useQueryClient, useMutation } from '@tanstack/react-query'
 import UserContext from './UserContext'
 import { userReducer } from './UserContext'
+import { useNotificationsDispatch } from './NotificationContext'
 import styled from 'styled-components'
 
+import Navigation from './components/Navigation'
 import Togglable from './components/Togglable'
 import Login from './components/Login'
 import Blog from './components/Blog'
@@ -16,8 +18,6 @@ import User from './components/User'
 import blogService from './services/blogs'
 import loginService from './services/login'
 import userService from './services/users'
-
-import { useNotificationsDispatch } from './NotificationContext'
 
 // STYLING
 const Container = styled.div`
@@ -178,30 +178,10 @@ const App = () => {
             />
           ) : (
             <>
-              <Header>
-                <h2 style={{ fontSize: '32px' }}>Blogs</h2>
+              <Header style={{ display: 'flex', flexDirection: 'column' }}>
+                <Navigation user={user} userDispatch={userDispatch} />
                 <div>
-                  Signed in as {user.username}
-                  <Button
-                    style={{ marginLeft: 4 }}
-                    onClick={() => {
-                      window.localStorage.removeItem('loggedInUser')
-                      userDispatch({ type: 'CLEAR' })
-                      setNotificationClass('success')
-                      dispatchNotification({
-                        type: 'SET',
-                        message: 'Signed out.',
-                      })
-                      setTimeout(() => {
-                        dispatchNotification({
-                          type: 'CLEAR',
-                        })
-                        setNotificationClass(null)
-                      }, 3000)
-                    }}
-                  >
-                    Log Out
-                  </Button>
+                  <h2 style={{ fontSize: '32px' }}>Blogs</h2>
                 </div>
               </Header>
             </>
@@ -248,6 +228,22 @@ const App = () => {
               }
             />
             <Route path="/users/:id" element={<User users={users} />} />
+            <Route path="/blogs/" element={
+              blogs.sort(byLikes).map((blog) => (
+                <Blog
+                  key={blog.id}
+                  blog={blog}
+                  likeBlog={likeBlog}
+                  removeBlog={removeBlog}
+                />
+              ))
+            } />
+            <Route path="/blogs/:id" element={
+              <Blog
+                blogs={blogs}
+                likeBlog={likeBlog}
+                removeBlog={removeBlog}
+              />}/>
           </Routes>
         </Container>
       </UserContext.Provider>

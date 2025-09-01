@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Link, useParams } from 'react-router-dom'
 import blogService from '../services/blogs'
 import styled from 'styled-components'
 
@@ -8,6 +9,7 @@ const BlogContainer = styled.div`
   display: flex;
   flex-direction: row;
   justify-content: space-between;
+  padding: 8px;
 `
 
 const ExpandedBlogContainer = styled.div`
@@ -37,7 +39,25 @@ const Button = styled.button`
   font-weight: bold;
 `
 
-const Blog = ({ blog, likeBlog, removeBlog }) => {
+const StyledLink = styled(Link)`
+  color: black;
+  font-size: 20px;
+  font-weight: bold;
+  text-decoration: none;
+  &:visited {
+    color: peru;
+  }
+  &:hover {
+    text-decoration: underline;
+  }
+`
+
+const Blog = ({ blog, blogs, likeBlog, removeBlog }) => {
+  const param = useParams().id
+  if(param){
+    blog = blogs.find(b => b.id === param)
+  }
+
   const [showDetails, setShowDetails] = useState(false)
 
   const [likes, setLikes] = useState(blog.likes)
@@ -46,13 +66,12 @@ const Blog = ({ blog, likeBlog, removeBlog }) => {
     setShowDetails(!showDetails)
   }
 
-  if (!showDetails) {
+  if (!param) {
     return (
       <BlogContainer data-testid="blogClosed">
-        <p>
+        <StyledLink to={`/blogs/${blog.id}`}>
           {blog.title} - By: {blog.author}
-        </p>
-        <Button onClick={toggleDetails}>view</Button>
+        </StyledLink>
       </BlogContainer>
     )
   }
@@ -61,12 +80,13 @@ const Blog = ({ blog, likeBlog, removeBlog }) => {
     <ExpandedBlogContainer data-testid="blogOpened">
       <BlogInfo>
         <BlogTitle>
-          <p>
+          <StyledLink to={`/blogs/${blog.id}`}>
             {blog.title} - By: {blog.author}
-          </p>
-          <Button onClick={toggleDetails}>hide</Button>
+          </StyledLink>
         </BlogTitle>
-        <p>{blog.url}</p>
+        <StyledLink to={blog.url} target='_blank'>
+          {blog.url}
+        </StyledLink>
         <p>
           {likes} likes{' '}
           <Button
@@ -79,7 +99,7 @@ const Blog = ({ blog, likeBlog, removeBlog }) => {
             like
           </Button>
         </p>
-        <p>{blog.user.username}</p>
+        <p>Added by: {blog.user.username}</p>
       </BlogInfo>
       <Button onClick={() => removeBlog(blog)}>remove</Button>
     </ExpandedBlogContainer>
