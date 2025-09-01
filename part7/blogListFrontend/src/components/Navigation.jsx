@@ -8,7 +8,7 @@ import { useNotificationsDispatch } from '../NotificationContext'
 const NavContainer = styled.div`
   width: 95%;
   display: flex;
-  justify-content: space-around;
+  justify-content: space-between;
   align-items: center;
   margin: 0 auto;
   padding: 8px;
@@ -43,7 +43,7 @@ const Navigation = ({ user, userDispatch }) => {
 
   return(
     <NavContainer>
-      <ul style={{ display: 'flex', listStyle: 'none', padding: 0 }}>
+      <ul style={{ display: 'flex', listStyle: 'none', paddingLeft: 8 }}>
         <li style={{ paddingRight: 12 }}>
           <StyledLink to={'/blogs/'}>Blogs</StyledLink>
         </li>

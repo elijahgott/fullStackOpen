@@ -168,6 +168,8 @@ const App = () => {
       <UserContext.Provider value={[user, userDispatch]}>
         <Container>
           <Notification className={notificationClass} />
+          <Header style={{ display: 'flex', flexDirection: 'column' }}>
+          </Header>
           {user === null ? (
             <Login
               handleLogin={handleLogin}
@@ -178,73 +180,70 @@ const App = () => {
             />
           ) : (
             <>
-              <Header style={{ display: 'flex', flexDirection: 'column' }}>
-                <Navigation user={user} userDispatch={userDispatch} />
-                <div>
-                  <h2 style={{ fontSize: '32px' }}>Blogs</h2>
-                </div>
-              </Header>
-            </>
-          )}
-
-          <Routes>
-            <Route
-              path="/"
-              element={
-                <>
-                  <Togglable buttonLabel={'New Note'}>
-                    <CreateBlog setNotificationClass={setNotificationClass} />
-                  </Togglable>
-                  {blogs.sort(byLikes).map((blog) => (
+              <Navigation user={user} userDispatch={userDispatch} />
+              <div>
+                <h2 style={{ fontSize: '32px' }}>Blogs</h2>
+              </div>
+              <Routes>
+                <Route
+                  path="/"
+                  element={
+                    <>
+                      <Togglable buttonLabel={'New Note'}>
+                        <CreateBlog setNotificationClass={setNotificationClass} />
+                      </Togglable>
+                      {blogs.sort(byLikes).map((blog) => (
+                        <Blog
+                          key={blog.id}
+                          blog={blog}
+                          likeBlog={likeBlog}
+                          removeBlog={removeBlog}
+                        />
+                      ))}
+                    </>
+                  }
+                />
+                <Route
+                  path="/users"
+                  element={
+                    <>
+                      <h1>Users</h1>
+                      <table>
+                        <thead>
+                          <tr style={{ textAlign: 'left', fontSize: 20 }}>
+                            <th>User</th>
+                            <th>Blogs Created</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {!users
+                            ? null
+                            : users.map((u) => <Users key={u.id} user={u} />)}
+                        </tbody>
+                      </table>
+                    </>
+                  }
+                />
+                <Route path="/users/:id" element={<User users={users} />} />
+                <Route path="/blogs/" element={
+                  blogs.sort(byLikes).map((blog) => (
                     <Blog
                       key={blog.id}
                       blog={blog}
                       likeBlog={likeBlog}
                       removeBlog={removeBlog}
                     />
-                  ))}
-                </>
-              }
-            />
-            <Route
-              path="/users"
-              element={
-                <>
-                  <h1>Users</h1>
-                  <table>
-                    <thead>
-                      <tr>
-                        <th></th>
-                        <th>blogs created</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {!users
-                        ? null
-                        : users.map((u) => <Users key={u.id} user={u} />)}
-                    </tbody>
-                  </table>
-                </>
-              }
-            />
-            <Route path="/users/:id" element={<User users={users} />} />
-            <Route path="/blogs/" element={
-              blogs.sort(byLikes).map((blog) => (
-                <Blog
-                  key={blog.id}
-                  blog={blog}
-                  likeBlog={likeBlog}
-                  removeBlog={removeBlog}
-                />
-              ))
-            } />
-            <Route path="/blogs/:id" element={
-              <Blog
-                blogs={blogs}
-                likeBlog={likeBlog}
-                removeBlog={removeBlog}
-              />}/>
-          </Routes>
+                  ))
+                } />
+                <Route path="/blogs/:id" element={
+                  <Blog
+                    blogs={blogs}
+                    likeBlog={likeBlog}
+                    removeBlog={removeBlog}
+                  />}/>
+              </Routes>
+            </>
+          )}
         </Container>
       </UserContext.Provider>
     </Router>

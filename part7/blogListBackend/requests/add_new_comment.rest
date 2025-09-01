@@ -1,0 +1,7 @@
+POST http://localhost:3003/api/blogs/68b629070c4f91a703757df9/comments
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImVsbyIsImlkIjoiNjg5YmQ5YWNkYWI2YmFjNTNmNzFmZTNhIiwiaWF0IjoxNzU1MDQ3MjQzfQ.4e5f8JgDJpYW_VTG-4SxsLa3qkc70w3Bg95U2q_N9FM
+
+{
+    "comment": "joe rogan is bald LOL"
+}

@@ -100,6 +100,14 @@ const Blog = ({ blog, blogs, likeBlog, removeBlog }) => {
           </Button>
         </p>
         <p>Added by: {blog.user.username}</p>
+        <h3>Comments</h3>
+        {blog.comments.length === 0
+          ? (<p style={{ color: 'gray', marginLeft: 8 }}>Nothing to see here...</p>)
+          : (
+            <ul>
+              {blog.comments.map(c => <li key={`${blog.id + c}`}>{c}</li>)}
+            </ul>
+          )}
       </BlogInfo>
       <Button onClick={() => removeBlog(blog)}>remove</Button>
     </ExpandedBlogContainer>
