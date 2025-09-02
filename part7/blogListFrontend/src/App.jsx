@@ -240,6 +240,7 @@ const App = () => {
                     blogs={blogs}
                     likeBlog={likeBlog}
                     removeBlog={removeBlog}
+                    setNotificationClass={setNotificationClass}
                   />}/>
               </Routes>
             </>

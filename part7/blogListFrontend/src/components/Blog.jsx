@@ -1,6 +1,9 @@
 import { useState } from 'react'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { Link, useParams } from 'react-router-dom'
 import blogService from '../services/blogs'
+import { useNotificationsDispatch } from '../NotificationContext'
+
 import styled from 'styled-components'
 
 // STYLES
@@ -29,16 +32,6 @@ const BlogTitle = styled.div`
   justify-content: space-between;
 `
 
-const Button = styled.button`
-  color: white;
-  background-color: peru;
-  border: 2px solid peru;
-  border-radius: 4px;
-  margin: 4px 0px;
-  padding: 8px 16px;
-  font-weight: bold;
-`
-
 const StyledLink = styled(Link)`
   color: black;
   font-size: 20px;
@@ -52,18 +45,87 @@ const StyledLink = styled(Link)`
   }
 `
 
-const Blog = ({ blog, blogs, likeBlog, removeBlog }) => {
+const Form = styled.form`
+  display: flex;
+  flex-direction: column;
+  width: auto;
+  margin-left: 0;
+  margin-right: auto;
+`
+const Button = styled.button`
+  color: white;
+  background-color: peru;
+  border: 2px solid peru;
+  border-radius: 4px;
+  margin: 4px 0px;
+  padding: 8px 16px;
+  font-weight: bold;
+`
+
+const Input = styled.input`
+  padding: 8px;
+  margin: 4px;
+  border: none;
+  border-bottom: 2px solid black;
+`
+
+const Blog = ({ blog, blogs, likeBlog, removeBlog, setNotificationClass }) => {
   const param = useParams().id
   if(param){
     blog = blogs.find(b => b.id === param)
   }
 
-  const [showDetails, setShowDetails] = useState(false)
+  const queryClient = useQueryClient()
+
+  const newCommentMutation = useMutation({
+    mutationFn: blogService.createComment,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['blogs'] })
+    }
+  })
+  const dispatchNotification = useNotificationsDispatch()
 
   const [likes, setLikes] = useState(blog.likes)
 
-  const toggleDetails = () => {
-    setShowDetails(!showDetails)
+  const [comment, setComment] = useState('')
+
+  const handleSubmit = (event) => {
+    event.preventDefault()
+
+    if(comment){
+      const updatedBlog = {
+        ...blog,
+        comment
+      }
+
+      newCommentMutation.mutate(updatedBlog)
+      setComment('')
+
+      setNotificationClass('success')
+      dispatchNotification({
+        type: 'SET',
+        message: `New Comment "${comment}" added to ${blog.title}`
+      })
+      setTimeout(() => {
+        setNotificationClass(null)
+        dispatchNotification({
+          type: 'CLEAR'
+        })
+      }, 5000)
+    }
+    else{
+      setNotificationClass('error')
+      dispatchNotification({
+        type: 'SET',
+        message: 'Error adding comment.'
+      })
+      setTimeout(() => {
+        setNotificationClass(null)
+        dispatchNotification({
+          type: 'CLEAR'
+        })
+      }, 5000)
+    }
   }
 
   if (!param) {
@@ -108,6 +170,17 @@ const Blog = ({ blog, blogs, likeBlog, removeBlog }) => {
               {blog.comments.map(c => <li key={`${blog.id + c}`}>{c}</li>)}
             </ul>
           )}
+        <Form onSubmit={ handleSubmit }>
+          <Input
+            type="text"
+            data-testid="comment"
+            name='comment'
+            value={comment}
+            onChange={({ target }) => setComment(target.value)}
+            placeholder="Add Comment..."
+          />
+          <Button type='submit'>Submit</Button>
+        </Form>
       </BlogInfo>
       <Button onClick={() => removeBlog(blog)}>remove</Button>
     </ExpandedBlogContainer>
