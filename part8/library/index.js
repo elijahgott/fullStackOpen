@@ -79,7 +79,6 @@ const resolvers = {
     authorCount: () => authors.length,
     allBooks: (root, args) => {
       let ret = [...books]
-      console.log(args)
 
       if(args.author){
         ret = ret.filter(b => b.author === args.author)
