@@ -1,0 +1,17 @@
+{
+  "name": "9bexercises",
+  "version": "1.0.0",
+  "description": "exercises for part 9b",
+  "license": "ISC",
+  "author": "Elijah Gott",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "calculateBMI": "ts-node bmiCalculator.ts",
+    "calculateExercises": "ts-node exerciseCalculator.ts"
+  },
+  "devDependencies": {
+    "@types/node": "^24.9.0"
+  }
+}
