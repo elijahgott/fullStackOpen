@@ -11,22 +11,22 @@ const parseBmiArguments = (args: string[]) : BodyValues => {
     return {
       height: Number(args[2]),
       weight: Number(args[3])
-    }
+    };
   } else {
     throw new Error('Provided values were not numbers!');
   }
-}
+};
 
-type BmiRange = 'underweight' | 'normal' | 'overweight' | 'obese'
+type BmiRange = 'underweight' | 'normal' | 'overweight' | 'obese';
 
-const calculateBmi = (height: number, weight: number) : BmiRange => {
+export const calculateBmi = (height: number, weight: number) : BmiRange | undefined => {
   const bmi = weight / ((height / 100) * (height / 100));
 
   if(bmi < 18.5){
     return 'underweight';
   }
   else if(bmi <= 24.9){
-    return 'normal'
+    return 'normal';
   }
   else if(bmi <= 29.9){
     return 'overweight';
@@ -34,7 +34,8 @@ const calculateBmi = (height: number, weight: number) : BmiRange => {
   else if(bmi >= 30){
     return 'obese';
   }
-}
+  else return undefined;
+};
 
 try{
   const { height, weight } = parseBmiArguments(process.argv);
@@ -46,5 +47,5 @@ catch (error: unknown){
   if(error instanceof Error){
     errorMessage += ' Error: ' + error.message;
   }
-  console.log(errorMessage)
+  console.log(errorMessage);
 }

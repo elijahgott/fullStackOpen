@@ -13,7 +13,7 @@ const parseExerciseArguments = (args: string[]) : Inputs => {
     throw new Error('Provided values were not numbers!');
   }
 
-  let exercises = [];
+  const exercises = [];
   for(let i = 3; i < args.length; i++){
     if(!isNaN(Number(args[i]))){
       exercises.push(Number(args[i]));
@@ -26,20 +26,20 @@ const parseExerciseArguments = (args: string[]) : Inputs => {
   return {
     target,
     exercises
-  }
-}
+  };
+};
 
 interface Result {
   periodLength: number,
   trainingDays: number,
   success: boolean,
-  rating: number,
-  ratingDescription: string,
+  rating: number | undefined,
+  ratingDescription: string | undefined,
   target: number,
   average: number
 }
 
-const calculateExercises = (target: number, exercises: number[]) : Result => {
+export const calculateExercises = (target: number, exercises: number[]) : Result => {
   const periodLength = exercises.length;
   const trainingDays = exercises.filter(e => e > 0).length;
   const average = exercises.reduce((a, b) => a + b, 0) / periodLength;
@@ -48,15 +48,15 @@ const calculateExercises = (target: number, exercises: number[]) : Result => {
   let ratingDescription;
   if(average < 1){
     rating = 1;
-    ratingDescription = 'You are a lazy MF.'
+    ratingDescription = 'You are a lazy MF.';
   }
   else if(average < 2){
     rating = 2;
-    ratingDescription = 'This is lowkey pretty solid.'
+    ratingDescription = 'This is lowkey pretty solid.';
   }
   else if(average >= 2){
     rating = 3;
-    ratingDescription = 'Holy moly!! Goated!'
+    ratingDescription = 'Holy moly!! Goated!';
   }
 
   return {
@@ -67,8 +67,8 @@ const calculateExercises = (target: number, exercises: number[]) : Result => {
     ratingDescription,
     target,
     average
-  }
-}
+  };
+};
 
 try{
   const { target, exercises } = parseExerciseArguments(process.argv);
@@ -80,5 +80,5 @@ catch (error: unknown){
   if(error instanceof Error){
     errorMessage += ' Error: ' + error.message;
   }
-  console.log(errorMessage)
+  console.log(errorMessage);
 }
